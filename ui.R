@@ -26,8 +26,12 @@ shinyUI(
                                              "June" = 6,
                                              "July" = 7,
                                              "August" = 8,
-                                            "Septemper" = 9), multiple=TRUE)
+                                            "Septemper" = 9), 
+                                ,multiple=TRUE),                    
+                    actionButton("goButton1","Go!")
             ),
+            
+            
             conditionalPanel(
                     'input.dataset === "Data Source"',
                     helpText('Display 10 records by default.')
@@ -40,7 +44,7 @@ shinyUI(
                              p("You have selected: "),
                              verbatimTextOutput("omonth")          ),
                     tabPanel('Wind', 
-                             showOutput("myScatterPlot","polycharts"),
+                             plotOutput("myScatterPlot"),
                              p("You have selected: "),
                              verbatimTextOutput("omonth2")   
                              ),

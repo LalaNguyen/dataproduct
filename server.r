@@ -1,6 +1,5 @@
 library(UsingR)
-require(rCharts)
-options(RCHART_WIDTH = 800)
+require(ggplot2)
 
 data(airquality)
 
@@ -16,15 +15,21 @@ shinyServer(
         airquality     
      }, options = list(lengthMenu = c(10, 30, 50), pageLength = 10))
     
-    output$myScatterPlot <- renderChart2({
-         subset <- airquality[airquality$Month==input$selectMonth,]
-         p1 <- rPlot(Wind~Day, data=subset, color="Month",type="point",size = list(const = 3))
-         p1$addParams(width = 600, height = 400, dom = 'chart1',
-                     title = " Wind Scatter Plot on regular daily basis")
-         p1$guides(x = list(title = "", min = 0,max = 32 ))
-         p1$guides(y = list(title = "", max = 22))
-         return(p1)
-         })
+    
+    output$myScatterPlot <- renderPlot({
+         dfm <- airquality[,c("Wind","Day","Month")]
+         
+         input$goButton1
+         
+         dataInput <- reactive({
+                 dfm[dfm$Month %in% input$selectMonth,]
+                 })
+         isolate(ggplot(dataInput(), aes(Day, Wind), colour = factor(Month))+
+                 geom_point()+
+                 geom_line(stat = "hline", yintercept = "mean", aes(colour = factor(Month))))
+         
+                 })
+    
     output$omonth2 <- renderPrint({
             input$selectMonth
     })
@@ -35,7 +40,9 @@ shinyServer(
       dataInput <- reactive({
         dfm[dfm$Month %in% input$checkGroup,]
         })
+    
       isolate(ggplot(dataInput(), aes(x=Day, y=Temp, group=Month, color=Month)) + geom_line(size = 1))
+      
       })
     })
   }
